@@ -85,7 +85,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties PublishMethod="ConstellationServer" PublishServer="https://www.constellation.roddone.ovh" />
+      <UserProperties PublishMethod="LocalFile" PublishPath="D:\_Personnel\DOMOTIQUE\constellation-packages - Copie\Yeelight" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

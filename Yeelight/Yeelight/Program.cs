@@ -8,6 +8,8 @@ using Yeelight.Configs;
 using YeelightAPI;
 using YeelightAPI.Models;
 using YeelightAPI.Models.Adjust;
+using YeelightAPI.Models.ColorFlow;
+using YeelightAPI.Models.Scene;
 
 namespace Yeelight
 {
@@ -122,8 +124,9 @@ namespace Yeelight
                             catch (Exception ex)
                             {
                                 if (!states.ContainsKey(kvp.Key) || states[kvp.Key] == true)
-                                { // log only if previous attempt was a success
-                                    PackageHost.WriteError($"An error occurred while fetching device '{device.Name}' ({device.Hostname}:{device.Port}) state, message : {ex.Message} | {ex.InnerException?.Message}");
+                                { 
+                                    // log only if previous attempt was a success
+                                    PackageHost.WriteError($"An error occurred while fetching device '{device.Name}' ({device.Hostname}:{device.Port}) state, message : {ex.Message} | {ex.InnerException?.Message} | {ex.StackTrace}");
                                 }
 
                                 states[kvp.Key] = false;
@@ -423,6 +426,120 @@ namespace Yeelight
             IDeviceController device = GetControllerDevice(deviceOrGroupName);
 
             return device.TurnOn(smooth, mode).Result;
+        }
+
+        /// <summary>
+        /// Turn to sunrise from 0 to 100% on 15 minutes and keep bulb on
+        /// </summary>
+        /// <param name="deviceOrGroupName">Device's name</param>
+        /// <returns></returns>
+        [MessageCallback]
+        public bool StartSunRise(string deviceOrGroupName)
+        {
+            IDeviceController device = GetControllerDevice(deviceOrGroupName);
+
+            ColorFlow flow = new ColorFlow(1, ColorFlowEndAction.Keep)
+            {
+                new ColorFlowTemperatureExpression(2500, 30, 30000),
+                new ColorFlowSleepExpression(1000),
+                new ColorFlowTemperatureExpression(3000, 40, 30000),
+                new ColorFlowSleepExpression(1000),
+                new ColorFlowTemperatureExpression(3500, 50, 30000),
+                new ColorFlowSleepExpression(1000),
+                new ColorFlowTemperatureExpression(3700, 60, 30000),
+                new ColorFlowSleepExpression(1000),
+                new ColorFlowTemperatureExpression(4000, 10, 30000),
+            };
+
+            return device.SetScene(Scene.FromColorFlow(flow)).Result;
+        }
+
+        /// <summary>
+        /// Turn to sunset from 100% to 0 on 15 minutes and turn bulb off
+        /// </summary>
+        /// <param name="deviceOrGroupName">Device's name</param>
+        /// <returns></returns>
+        [MessageCallback]
+        public bool StartSunSet(string deviceOrGroupName)
+        {
+            IDeviceController device = GetControllerDevice(deviceOrGroupName);
+
+            ColorFlow flow = new ColorFlow(3, ColorFlowEndAction.TurnOff)
+            {
+                new ColorFlowTemperatureExpression(2700, 10, 50),
+                new ColorFlowTemperatureExpression(1700, 5, 180000),
+                new ColorFlowRGBExpression(255, 0, 4, 1, 420000)
+            };
+
+            return device.SetScene(Scene.FromColorFlow(flow)).Result;
+        }
+
+        /// <summary>
+        /// Start a 4-7-8 Breath indicator on selected device
+        /// </summary>
+        /// <param name="deviceOrGroupName">Device's name</param>
+        /// <returns></returns>
+        [MessageCallback]
+        public bool StartFourSevenEight(string deviceOrGroupName)
+        {
+            IDeviceController device = GetControllerDevice(deviceOrGroupName);
+
+            ColorFlow flow = new ColorFlow(30, ColorFlowEndAction.TurnOff)
+            {
+                new ColorFlowRGBExpression(255, 65, 17, 10, 300),
+                new ColorFlowSleepExpression(4000),
+                new ColorFlowRGBExpression(255, 230, 0, 10, 300),
+                new ColorFlowSleepExpression(7000),
+                new ColorFlowRGBExpression(255, 120, 0, 10, 300),
+                new ColorFlowSleepExpression(8000)
+            };
+
+            return device.SetScene(Scene.FromColorFlow(flow)).Result;
+        }
+
+        /// <summary>
+        /// Turn to romantic mode
+        /// </summary>
+        /// <param name="deviceOrGroupName">Device's name</param>
+        /// <returns></returns>
+        [MessageCallback]
+        public bool StartRomantic(string deviceOrGroupName)
+        {
+            IDeviceController device = GetControllerDevice(deviceOrGroupName);
+
+            ColorFlow flow = new ColorFlow(0, ColorFlowEndAction.TurnOff)
+            {
+                new ColorFlowRGBExpression(255, 0, 204, 40, 2000),
+                new ColorFlowSleepExpression(3000),
+                new ColorFlowRGBExpression(255, 0, 255, 30, 2000),
+                new ColorFlowSleepExpression(3000)
+            };
+
+            return device.SetScene(Scene.FromColorFlow(flow)).Result;
+        }
+
+        /// <summary>
+        /// Turn device on with high luminosity
+        /// </summary>
+        /// <param name="deviceOrGroupName">Device's name</param>
+        /// <returns></returns>
+        [MessageCallback]
+        public bool TurnOnDay(string deviceOrGroupName)
+        {
+            IDeviceController device = GetControllerDevice(deviceOrGroupName);
+            return device.SetScene(Scene.FromColorTemperature(2700, 100)).Result;
+        }
+
+        /// <summary>
+        /// Turn device on with low luminosity
+        /// </summary>
+        /// <param name="deviceOrGroupName">Device's name</param>
+        /// <returns></returns>
+        [MessageCallback]
+        public bool TurnOnNight(string deviceOrGroupName)
+        {
+            IDeviceController device = GetControllerDevice(deviceOrGroupName);
+            return device.SetScene(Scene.FromColorTemperature(2700, 25)).Result;
         }
 
         #endregion MessageCallbacks
