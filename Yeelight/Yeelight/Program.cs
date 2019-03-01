@@ -22,6 +22,31 @@ namespace Yeelight
 
         private static Dictionary<string, object> _all = new Dictionary<string, object>();
 
+        private static readonly IEnumerable<ColorFlowExpression> SunRiseFlowExp = new List<ColorFlowExpression>(21)
+        {
+            new ColorFlowRGBExpression(255, 0, 0, 1),
+            new ColorFlowSleepExpression(60000),
+            new ColorFlowRGBExpression(255, 80, 0, 5),
+            new ColorFlowSleepExpression(60000),
+            new ColorFlowRGBExpression(255, 100, 0, 10),
+            new ColorFlowSleepExpression(60000),
+            new ColorFlowRGBExpression(255, 120, 0, 15),
+            new ColorFlowSleepExpression(60000),
+            new ColorFlowRGBExpression(255, 140, 0, 20),
+            new ColorFlowSleepExpression(60000),
+            new ColorFlowRGBExpression(255, 160, 0, 35),
+            new ColorFlowSleepExpression(60000),
+            new ColorFlowRGBExpression(255, 180, 0, 40),
+            new ColorFlowSleepExpression(60000),
+            new ColorFlowRGBExpression(255, 200, 0, 45),
+            new ColorFlowSleepExpression(60000),
+            new ColorFlowRGBExpression(255, 220, 0, 50),
+            new ColorFlowSleepExpression(60000),
+            new ColorFlowRGBExpression(255, 240, 0, 50),
+            new ColorFlowSleepExpression(60000),
+            new ColorFlowRGBExpression(255, 260, 0, 50),
+        };
+
         #endregion Private Attributes
 
         #region Constellation Init
@@ -39,7 +64,7 @@ namespace Yeelight
                     {
                         disposableDevice.Dispose();
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         PackageHost.WriteError("Unable to dispose device '{dc.Name}' ({device.Hostname}:{device.Port})");
                     }
@@ -73,7 +98,7 @@ namespace Yeelight
                         PackageHost.WriteInfo($"device '{dc.Name}' ({device.Hostname}:{device.Port}) connected");
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     PackageHost.WriteWarn($"Cannot connect device '{device.Name}' ({device.Hostname}:{device.Port}), message : {ex.Message}");
                 }
@@ -124,7 +149,7 @@ namespace Yeelight
                             catch (Exception ex)
                             {
                                 if (!states.ContainsKey(kvp.Key) || states[kvp.Key] == true)
-                                { 
+                                {
                                     // log only if previous attempt was a success
                                     PackageHost.WriteError($"An error occurred while fetching device '{device.Name}' ({device.Hostname}:{device.Port}) state, message : {ex.Message} | {ex.InnerException?.Message} | {ex.StackTrace}");
                                 }
@@ -429,7 +454,7 @@ namespace Yeelight
         }
 
         /// <summary>
-        /// Turn to sunrise from 0 to 100% on 15 minutes and keep bulb on
+        /// Turn to sunrise from 0 to 100% on 10 minutes and keep bulb on
         /// </summary>
         /// <param name="deviceOrGroupName">Device's name</param>
         /// <returns></returns>
@@ -438,18 +463,20 @@ namespace Yeelight
         {
             IDeviceController device = GetControllerDevice(deviceOrGroupName);
 
-            ColorFlow flow = new ColorFlow(1, ColorFlowEndAction.Keep)
-            {
-                new ColorFlowTemperatureExpression(2500, 30, 30000),
-                new ColorFlowSleepExpression(1000),
-                new ColorFlowTemperatureExpression(3000, 40, 30000),
-                new ColorFlowSleepExpression(1000),
-                new ColorFlowTemperatureExpression(3500, 50, 30000),
-                new ColorFlowSleepExpression(1000),
-                new ColorFlowTemperatureExpression(3700, 60, 30000),
-                new ColorFlowSleepExpression(1000),
-                new ColorFlowTemperatureExpression(4000, 10, 30000),
-            };
+            ColorFlow flow = new ColorFlow(1, ColorFlowEndAction.Keep, SunRiseFlowExp);
+
+            //ColorFlow flow = new ColorFlow(1, ColorFlowEndAction.Keep)
+            //{
+            //    new ColorFlowTemperatureExpression(2500, 30, 30000),
+            //    new ColorFlowSleepExpression(1000),
+            //    new ColorFlowTemperatureExpression(3000, 40, 30000),
+            //    new ColorFlowSleepExpression(1000),
+            //    new ColorFlowTemperatureExpression(3500, 50, 30000),
+            //    new ColorFlowSleepExpression(1000),
+            //    new ColorFlowTemperatureExpression(3700, 60, 30000),
+            //    new ColorFlowSleepExpression(1000),
+            //    new ColorFlowTemperatureExpression(4000, 10, 30000),
+            //};
 
             return device.SetScene(Scene.FromColorFlow(flow)).Result;
         }
@@ -464,12 +491,14 @@ namespace Yeelight
         {
             IDeviceController device = GetControllerDevice(deviceOrGroupName);
 
-            ColorFlow flow = new ColorFlow(3, ColorFlowEndAction.TurnOff)
-            {
-                new ColorFlowTemperatureExpression(2700, 10, 50),
-                new ColorFlowTemperatureExpression(1700, 5, 180000),
-                new ColorFlowRGBExpression(255, 0, 4, 1, 420000)
-            };
+            ColorFlow flow = new ColorFlow(1, ColorFlowEndAction.Keep, SunRiseFlowExp.Reverse());
+
+            //ColorFlow flow = new ColorFlow(1, ColorFlowEndAction.TurnOff)
+            //{
+            //    new ColorFlowTemperatureExpression(2700, 10, 50),
+            //    new ColorFlowTemperatureExpression(1700, 5, 180000),
+            //    new ColorFlowRGBExpression(255, 0, 4, 1, 420000)
+            //};
 
             return device.SetScene(Scene.FromColorFlow(flow)).Result;
         }
@@ -486,11 +515,11 @@ namespace Yeelight
 
             ColorFlow flow = new ColorFlow(30, ColorFlowEndAction.TurnOff)
             {
-                new ColorFlowRGBExpression(255, 65, 17, 10, 300),
+                new ColorFlowRGBExpression(255, 65, 17, 1, 300),
                 new ColorFlowSleepExpression(4000),
-                new ColorFlowRGBExpression(255, 230, 0, 10, 300),
+                new ColorFlowRGBExpression(255, 230, 0, 1, 300),
                 new ColorFlowSleepExpression(7000),
-                new ColorFlowRGBExpression(255, 120, 0, 10, 300),
+                new ColorFlowRGBExpression(255, 120, 0, 1, 300),
                 new ColorFlowSleepExpression(8000)
             };
 
@@ -509,11 +538,21 @@ namespace Yeelight
 
             ColorFlow flow = new ColorFlow(0, ColorFlowEndAction.TurnOff)
             {
-                new ColorFlowRGBExpression(255, 0, 204, 40, 2000),
+                new ColorFlowRGBExpression(127, 0, 255, 10, 2000),
                 new ColorFlowSleepExpression(3000),
-                new ColorFlowRGBExpression(255, 0, 255, 30, 2000),
+                new ColorFlowRGBExpression(255, 0, 255, 10, 2000),
+                new ColorFlowSleepExpression(3000),
+                new ColorFlowRGBExpression(255, 0, 127, 10, 2000),
                 new ColorFlowSleepExpression(3000)
             };
+
+            //ColorFlow flow = new ColorFlow(0, ColorFlowEndAction.TurnOff)
+            //{
+            //    new ColorFlowRGBExpression(255, 0, 204, 10, 2000),
+            //    new ColorFlowSleepExpression(3000),
+            //    new ColorFlowRGBExpression(255, 0, 255, 10, 2000),
+            //    new ColorFlowSleepExpression(3000)
+            //};
 
             return device.SetScene(Scene.FromColorFlow(flow)).Result;
         }
@@ -527,7 +566,7 @@ namespace Yeelight
         public bool TurnOnDay(string deviceOrGroupName)
         {
             IDeviceController device = GetControllerDevice(deviceOrGroupName);
-            return device.SetScene(Scene.FromColorTemperature(2700, 100)).Result;
+            return device.SetScene(Scene.FromColorTemperature(5500, 100)).Result;
         }
 
         /// <summary>
