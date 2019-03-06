@@ -22,29 +22,18 @@ namespace Yeelight
 
         private static Dictionary<string, object> _all = new Dictionary<string, object>();
 
-        private static readonly IEnumerable<ColorFlowExpression> SunRiseFlowExp = new List<ColorFlowExpression>(21)
+        private static readonly IEnumerable<ColorFlowExpression> SunRiseFlowExp = new List<ColorFlowExpression>(10)
         {
-            new ColorFlowRGBExpression(255, 0, 0, 1),
-            new ColorFlowSleepExpression(60000),
-            new ColorFlowRGBExpression(255, 80, 0, 5),
-            new ColorFlowSleepExpression(60000),
-            new ColorFlowRGBExpression(255, 100, 0, 10),
-            new ColorFlowSleepExpression(60000),
-            new ColorFlowRGBExpression(255, 120, 0, 15),
-            new ColorFlowSleepExpression(60000),
-            new ColorFlowRGBExpression(255, 140, 0, 20),
-            new ColorFlowSleepExpression(60000),
-            new ColorFlowRGBExpression(255, 160, 0, 35),
-            new ColorFlowSleepExpression(60000),
-            new ColorFlowRGBExpression(255, 180, 0, 40),
-            new ColorFlowSleepExpression(60000),
-            new ColorFlowRGBExpression(255, 200, 0, 45),
-            new ColorFlowSleepExpression(60000),
-            new ColorFlowRGBExpression(255, 220, 0, 50),
-            new ColorFlowSleepExpression(60000),
-            new ColorFlowRGBExpression(255, 240, 0, 50),
-            new ColorFlowSleepExpression(60000),
-            new ColorFlowRGBExpression(255, 260, 0, 50),
+            new ColorFlowRGBExpression(255, 0, 0, 1, 60000),
+            new ColorFlowRGBExpression(255, 28, 0, 10, 60000),
+            new ColorFlowRGBExpression(255, 56, 0, 15, 60000),
+            new ColorFlowRGBExpression(255, 84, 0, 20, 60000),
+            new ColorFlowRGBExpression(255, 112, 0, 35, 60000),
+            new ColorFlowRGBExpression(255, 140, 0, 40, 60000),
+            new ColorFlowRGBExpression(255, 168, 0, 45, 60000),
+            new ColorFlowRGBExpression(255, 196, 0, 50, 60000),
+            new ColorFlowRGBExpression(255, 224, 0, 50, 60000),
+            new ColorFlowRGBExpression(255, 255, 0, 50, 60000),
         };
 
         #endregion Private Attributes
