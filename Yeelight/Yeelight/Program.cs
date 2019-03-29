@@ -24,7 +24,7 @@ namespace Yeelight
 
         private static readonly IEnumerable<ColorFlowExpression> SunRiseFlowExp = new List<ColorFlowExpression>(10)
         {
-            new ColorFlowRGBExpression(255, 0, 0, 1, 60000),
+            new ColorFlowRGBExpression(255, 0, 0, 1, 50),
             new ColorFlowRGBExpression(255, 28, 0, 10, 60000),
             new ColorFlowRGBExpression(255, 56, 0, 15, 60000),
             new ColorFlowRGBExpression(255, 84, 0, 20, 60000),
@@ -33,7 +33,7 @@ namespace Yeelight
             new ColorFlowRGBExpression(255, 168, 0, 45, 60000),
             new ColorFlowRGBExpression(255, 196, 0, 50, 60000),
             new ColorFlowRGBExpression(255, 224, 0, 50, 60000),
-            new ColorFlowRGBExpression(255, 255, 0, 50, 60000),
+            new ColorFlowRGBExpression(255, 255, 0, 50, 50),
         };
 
         #endregion Private Attributes
