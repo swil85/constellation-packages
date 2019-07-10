@@ -64,19 +64,26 @@ namespace NewEbooks
                     ebook.Descendants("a").FirstOrDefault(node => node.GetAttributeValue("class", "").Equals("more-link button")).ChildAttributes("href").FirstOrDefault().Value);
             });
 
-            PackageHost.WriteInfo("Accès fiche descriptive pour les livres non deja traités.");
-            ebooks.Where(cur => !dejaConnu.Any(dc => dc.Titre.Equals(cur.Key))).ToList().ForEach(ebook =>
+            if (ebooks.Any())
             {
-                html = httpClient.GetStringAsync(ebook.Value).ConfigureAwait(false).GetAwaiter().GetResult();
-                htmlDoc.LoadHtml(html);
+                PackageHost.WriteInfo("Accès fiche descriptive pour les livres non deja traités.");
+                ebooks.Where(cur => !dejaConnu.Any(dc => dc.Titre.Equals(cur.Key))).ToList().ForEach(ebook =>
+                {
+                    html = httpClient.GetStringAsync(ebook.Value).ConfigureAwait(false).GetAwaiter().GetResult();
+                    htmlDoc.LoadHtml(html);
 
-                var info = htmlDoc.DocumentNode.Descendants("div").SingleOrDefault(node => node.GetAttributeValue("class", "").Equals("entry-content entry clearfix"));
-                info.Descendants("div").Where(node => node.GetAttributeValue("class", "").Contains("stream-item-above-post-content")).ToList().ForEach(cur => cur.Remove());
+                    var info = htmlDoc.DocumentNode.Descendants("div").SingleOrDefault(node => node.GetAttributeValue("class", "").Equals("entry-content entry clearfix"));
+                    info.Descendants("div").Where(node => node.GetAttributeValue("class", "").Contains("stream-item-above-post-content")).ToList().ForEach(cur => cur.Remove());
 
-                PackageHost.WriteInfo($"Envoi mail pour {ebook.Key}.");
-                SendMail(ebook.Key, info.OuterHtml);
-                ebookCol.InsertOne(new Livre(ebook.Key));
-            });
+                    PackageHost.WriteInfo($"Envoi mail pour {ebook.Key}.");
+                    SendMail(ebook.Key, info.OuterHtml);
+                    ebookCol.InsertOne(new Livre(ebook.Key));
+                });
+            }
+            else
+            {
+                PackageHost.WriteInfo("Aucun nouveau livre.");
+            }
         }
 
         /// <summary>
