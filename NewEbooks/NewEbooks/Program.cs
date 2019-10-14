@@ -49,35 +49,45 @@ namespace NewEbooks
                 var dejaConnu = ebookCol.Find(_ => true).ToList();
 
                 // Dico contenant la liste des livres avec lien vers fp
-                Dictionary<string, string> ebooks = new Dictionary<string, string>(10);
-
-                PackageHost.WriteInfo("Traitement de la première page.");
-                var url = "https://ww.1001ebooks.com/romans/erotique-epub/";
-                var httpClient = new HttpClient();
-                var html = httpClient.GetStringAsync(url).ConfigureAwait(false).GetAwaiter().GetResult();
+                Dictionary<string, string> ebooks;
+                string html;
                 var htmlDoc = new HtmlDocument();
-                htmlDoc.LoadHtml(html);
+                var httpClient = new HttpClient();
 
-                PackageHost.WriteInfo("Récupération des livres + lien vers fp.");
-                htmlDoc.DocumentNode.Descendants("div").Where(node => node.GetAttributeValue("class", "").Equals("post-details")).ToList().ForEach(ebook =>
+                new List<string>(2)
                 {
-                    ebooks.Add(
-                        ebook.Descendants("h3").FirstOrDefault(node => node.GetAttributeValue("class", "").Equals("post-title")).Descendants("a").FirstOrDefault().InnerText,
-                        ebook.Descendants("a").FirstOrDefault(node => node.GetAttributeValue("class", "").Equals("more-link button")).ChildAttributes("href").FirstOrDefault().Value);
-                });
+                    "https://ww.1001ebooks.com/romans/erotique-epub/",
+                    "https://ww.1001ebooks.com/romans/romance-epub/"
+                }
+                .ForEach(url =>
+                {
+                    ebooks = new Dictionary<string, string>(10);
 
-                PackageHost.WriteInfo("Accès fiche descriptive pour les livres non deja traités.");
-                ebooks.Where(cur => !dejaConnu.Any(dc => dc.Titre.Equals(cur.Key))).ToList().ForEach(ebook =>
-                {
-                    html = httpClient.GetStringAsync(ebook.Value).ConfigureAwait(false).GetAwaiter().GetResult();
+                    PackageHost.WriteInfo($"Traitement de {url}.");
+                    html = httpClient.GetStringAsync(url).ConfigureAwait(false).GetAwaiter().GetResult();
                     htmlDoc.LoadHtml(html);
 
-                    var info = htmlDoc.DocumentNode.Descendants("div").SingleOrDefault(node => node.GetAttributeValue("class", "").Equals("entry-content entry clearfix"));
-                    info.Descendants("div").Where(node => node.GetAttributeValue("class", "").Contains("stream-item-above-post-content")).ToList().ForEach(cur => cur.Remove());
+                    PackageHost.WriteInfo("Récupération des livres + lien vers fp.");
+                    htmlDoc.DocumentNode.Descendants("div").Where(node => node.GetAttributeValue("class", "").Equals("post-details")).ToList().ForEach(ebook =>
+                    {
+                        ebooks.Add(
+                            ebook.Descendants("h3").FirstOrDefault(node => node.GetAttributeValue("class", "").Equals("post-title")).Descendants("a").FirstOrDefault().InnerText,
+                            ebook.Descendants("a").FirstOrDefault(node => node.GetAttributeValue("class", "").Equals("more-link button")).ChildAttributes("href").FirstOrDefault().Value);
+                    });
 
-                    PackageHost.WriteInfo($"Envoi mail pour {ebook.Key}.");
-                    SendMail(ebook.Key, info.OuterHtml);
-                    ebookCol.InsertOne(new Livre(ebook.Key));
+                    PackageHost.WriteInfo("Accès fiche descriptive pour les livres non deja traités.");
+                    ebooks.Where(cur => !dejaConnu.Any(dc => dc.Titre.Equals(cur.Key))).ToList().ForEach(ebook =>
+                    {
+                        html = httpClient.GetStringAsync(ebook.Value).ConfigureAwait(false).GetAwaiter().GetResult();
+                        htmlDoc.LoadHtml(html);
+
+                        var info = htmlDoc.DocumentNode.Descendants("div").SingleOrDefault(node => node.GetAttributeValue("class", "").Equals("entry-content entry clearfix"));
+                        info.Descendants("div").Where(node => node.GetAttributeValue("class", "").Contains("stream-item-above-post-content")).ToList().ForEach(cur => cur.Remove());
+
+                        PackageHost.WriteInfo($"Envoi mail pour {ebook.Key}.");
+                        SendMail(ebook.Key, info.OuterHtml);
+                        ebookCol.InsertOne(new Livre(ebook.Key));
+                    });
                 });
 
                 PackageHost.WriteInfo("Fin de traitement.");
