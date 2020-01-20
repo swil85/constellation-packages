@@ -71,7 +71,7 @@ namespace NewEbooks
                     htmlDoc.DocumentNode.Descendants("div").Where(node => node.GetAttributeValue("class", "").Equals("post-details")).ToList().ForEach(ebook =>
                     {
                         ebooks.Add(
-                            ebook.Descendants("h3").FirstOrDefault(node => node.GetAttributeValue("class", "").Equals("post-title")).Descendants("a").FirstOrDefault().InnerText,
+                            ebook.Descendants("h2").FirstOrDefault(node => node.GetAttributeValue("class", "").Equals("post-title")).Descendants("a").FirstOrDefault().InnerText,
                             ebook.Descendants("a").FirstOrDefault(node => node.GetAttributeValue("class", "").Equals("more-link button")).ChildAttributes("href").FirstOrDefault().Value);
                     });
 
