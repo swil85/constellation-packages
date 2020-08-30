@@ -56,8 +56,8 @@ namespace NewEbooks
 
                 new List<string>(2)
                 {
-                    "https://ww.1001ebooks.com/romans/erotique-epub/",
-                    "https://ww.1001ebooks.com/romans/romance-epub/"
+                    "https://go.1001ebooks.com/romans-gratuit/erotique-epub/",
+                    "https://go.1001ebooks.com/romans-gratuit/romance-epub/"
                 }
                 .ForEach(url =>
                 {
