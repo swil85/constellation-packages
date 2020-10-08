@@ -2,6 +2,7 @@
 using System.Net;
 using System.Text;
 using System.Threading;
+using Constellation;
 using Constellation.Package;
 using XiaomiSmartHome.Equipement;
 
@@ -44,6 +45,15 @@ namespace XiaomiSmartHome
         public override void OnStart()
         {
             PackageHost.WriteInfo("Package starting - IsRunning: {0} - IsConnected: {1}", PackageHost.IsRunning, PackageHost.IsConnected);
+
+            PackageHost.LastStateObjectsReceived += (s, e) =>
+            {
+                PackageHost.WriteInfo("Received old StateObjects (Count:{0})", e.StateObjects.Count);
+                foreach (StateObject so in e.StateObjects)
+                {
+                    PackageHost.PushStateObject(so.Name, so.DynamicValue, so.Type, so.Metadatas, so.Lifetime);
+                }
+            };
 
             // Get the custom names
             soCustomNames = PackageHost.GetSettingAsJsonObject<Dictionary<string, string>>("soCustomNames");

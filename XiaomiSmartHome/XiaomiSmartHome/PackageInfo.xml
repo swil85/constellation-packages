@@ -6,6 +6,7 @@
          Icon="XiaomiSmartHome.png"
          URL="http://www.myconstellation.io"
          Description="Package to control Xiaomi Smart Home devices"
+         RequestLastStateObjectsOnStart="true"
          EnableControlHub="false">
   <Compatibility constellationVersion="1.8" dotNetTargetPlatform="net45">
     <Platforms>
