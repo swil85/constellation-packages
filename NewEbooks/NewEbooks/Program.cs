@@ -107,7 +107,7 @@ namespace NewEbooks
         {
             var fromAddress = new MailAddress("sebastien.wilhelm@gmail.com", "Ton Homme ;)");
             var toAddress = new MailAddress("sergent.melissa@gmail.com", "Mon amour");
-            const string fromPassword = "drejunzairott";
+            const string fromPassword = "gmykgxhyzknitgix";
 
             var smtp = new SmtpClient
             {
@@ -137,7 +137,7 @@ namespace NewEbooks
         private void SendErrorMail(string sujet, string contenu)
         {
             var address = new MailAddress("sebastien.wilhelm@gmail.com", "Swil");
-            const string fromPassword = "drejunzairott";
+            const string fromPassword = "gmykgxhyzknitgix";
 
             var smtp = new SmtpClient
             {
